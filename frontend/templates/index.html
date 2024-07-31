@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Chat Application</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .chat-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 300px;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 400px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        .message.user {
+            align-self: flex-end;
+            background-color: #e1f7d5;
+        }
+        .message.ai {
+            align-self: flex-start;
+            background-color: #ffebee;
+        }
+        .input-box {
+            display: flex;
+            align-items: center;
+        }
+        .input-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .input-box button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #5107ff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .input-box button:hover {
+            background-color: #7a42f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GenAI Chat Application</h1>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type a prompt here...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (!userInput) return;
+
+            const chatBox = document.getElementById('chat-box');
+            const userMessage = document.createElement('div');
+            userMessage.textContent = 'You: ' + userInput;
+            userMessage.classList.add('message', 'user');
+            chatBox.appendChild(userMessage);
+
+            const response = await fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: userInput }),
+            });
+
+            const result = await response.json();
+
+            const aiMessage = document.createElement('div');
+            aiMessage.textContent = 'AI: ' + result.received_data;
+            aiMessage.classList.add('message', 'ai');
+            chatBox.appendChild(aiMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            document.getElementById('user-input').value = '';
+        }
+    </script>
+</body>
+</html>
